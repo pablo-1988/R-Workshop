@@ -1,0 +1,434 @@
+---
+format: 
+  revealjs:
+    footer: "Synthetic Ecology Lab"
+    code-copy: true
+    center-title-slide: false
+    chalkboard: true
+    multiplex: true
+    transition: slide
+    slide-number: true
+    code-link: true
+    code-overflow: wrap
+    highlight-style: ayu-mirage
+    height: 1080
+    width: 1920
+editor: visual
+execute:
+  echo: true
+---
+
+<h1>R for efficient<br>exploratory data analysis</h1>
+
+<h2>with `tydiverse`</h2>
+
+<hr>
+
+<h3>Pablo Villarreal, Early Career Researcher at iBio</h3>
+
+<h3>2025</h3>
+
+<br>
+
+## What You Will Learn
+
+![](data-science.svg){fig-align="center"}
+
+## What You Will Learn
+
+![](data-science2.svg){fig-align="center"}
+
+## Where?
+
+::: {.columns .fragment fragment-index="1"}
+::: {.column width="50%"}
+### R
+
+> Is **a free, open-source programming language for statistical computing and data visualization**
+
+### RStudio
+
+> Is an integrated development environment, or IDE, for R programming, which you can download from <https://posit.co/download/rstudio-desktop/>
+:::
+
+::: {.column width="40%"}
+![](R_logo.svg.png){fig-align="center" width="400"}
+
+![](1592163389959.png){fig-align="center"}
+:::
+:::
+
+## 
+
+::: columns
+::: {.column width="30%"}
+The **RStudio** IDE has two key regions: type R code in the console pane on the left, and look for plots in the output pane on the right.
+:::
+
+::: {.column width="70%"}
+![](console.png){fig-align="center" width="900" height="800"}
+:::
+:::
+
+## **Packages**
+
+An R **package** is a collection of functions, data, and documentation that extends the capabilities of base R.
+
+![](paquetes.png){fig-align="center" width="403"}
+
+## **The tidyverse**
+
+::: columns
+::: {.column width="30%"}
+You can install the complete tidyverse with a single line of code:
+
+``` markdown
+install.packages("tidyverse")
+```
+:::
+
+::: {.column width="70%"}
+![](tidyverse_packages.png){fig-align="center"}
+:::
+:::
+
+## The tidyverse
+
+::: callout-important
+You will not be able to use the functions, objects, or help files in a package until you load it with [`library()`](https://rdrr.io/r/base/library.html).
+:::
+
+. . .
+
+```{r, echo=TRUE, warning=TRUE, message=TRUE}
+library(tidyverse)
+```
+
+## Data
+
+```{r}
+library(ggthemes)
+library(gt)
+library(palmerpenguins)
+
+penguins
+```
+
+::: aside
+Gorman KB, Williams TD, Fraser WR (2014). Ecological sexual dimorphism and environmental variability within a community of Antarctic penguins (genus Pygoscelis). PLoS ONE 9(3):e90081. https://doi.org/10.1371/journal.pone.0090081
+:::
+
+## Meet the penguins
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(palmerpenguins)
+```
+
+> The `penguins` data from the [**palmerpenguins**](https://allisonhorst.github.io/palmerpenguins "palmerpenguins R package") package contains size measurements for `{r} nrow(penguins)` penguins from three species observed on three islands in the Palmer Archipelago, Antarctica.
+
+![](https://raw.githubusercontent.com/quarto-dev/quarto-web/main/docs/get-started/hello/rstudio/lter_penguins.png){style="center;" fig-alt="Illustration of three species of Palmer Archipelago penguins: Chinstrap, Gentoo, and Adelie. Artwork by @allison_horst." fig-align="center" width="750"}
+
+::: aside
+Gorman KB, Williams TD, Fraser WR (2014). Ecological sexual dimorphism and environmental variability within a community of Antarctic penguins (genus Pygoscelis). PLoS ONE 9(3):e90081. https://doi.org/10.1371/journal.pone.0090081
+:::
+
+## Data
+
+```{r}
+library(knitr)
+library(kableExtra)
+
+penguins %>%
+  head() %>%
+  kable("html") %>%
+  kable_styling(font_size = 30, full_width = FALSE)
+```
+
+## Ultimate goal
+
+Our ultimate goal in this workshop is to recreate the following visualization displaying the relationship between flipper lengths and body masses of these penguins, taking into consideration the **species** of the penguin.
+
+```{r, dpi = 300}
+#| echo: false
+#| fig.align : center
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(aes(color = species, shape = species)) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Body mass and flipper length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper length (mm)", y = "Body mass (g)",
+    color = "Species", shape = "Species"
+  ) +
+  scale_color_colorblind()
+```
+
+## **Creating a ggplot**
+
+. . .
+
+```{r, fig.align = "center"}
+#| 
+ggplot(data = penguins)
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+)
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point()
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g, color = species)
+) +
+  geom_point()
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g, color = species)
+) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(mapping = aes(color = species)) +
+  geom_smooth(method = "lm")
+
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(mapping = aes(color = species, shape = species)) +
+  geom_smooth(method = "lm")
+
+```
+
+## **Creating a ggplot**
+
+```{r, fig.align = "center" }
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point(aes(color = species, shape = species)) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Body mass and flipper length",
+    subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+    x = "Flipper length (mm)", y = "Body mass (g)",
+    color = "Species", shape = "Species"
+  ) +
+  scale_color_colorblind()
+
+```
+
+## **ggplot2 calls**
+
+```{r, fig.align = "center"}
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point()
+```
+
+Rewriting the previous plot more concisely yields:
+
+## **ggplot2 calls**
+
+```{r, fig.align = "center"}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) + 
+  geom_point()
+```
+
+## **Visualizing distributions**
+
+### A categorical variable
+
+A variable is categorical if it can only take one of a small set of values. To examine the distribution of a categorical variable, you can use a bar chart. The height of the bars displays how many observations occurred with each x value.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+```
+
+## **Visualizing distributions**
+
+### A categorical variable
+
+A variable is categorical if it can only take one of a small set of values.
+
+```{r, fig.align='center'}
+
+ggplot(penguins, aes(x = fct_infreq(species))) +
+  geom_bar()
+```
+
+## 
+
+### A numerical variable
+
+A variable is numerical (or quantitative) if it can take on a wide range of numerical values, and it is sensible to add, subtract, or take averages with those values. Numerical variables can be continuous or discrete. One commonly used visualization for distributions of continuous variables is a histogram.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+```
+
+## 
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 20)
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 2000)
+```
+
+## 
+
+An alternative visualization for distributions of numerical variables is a density plot. A density plot is a smoothed-out version of a histogram and a practical alternative, particularly for continuous data that comes from an underlying smooth distribution.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+```
+
+## **Visualizing relationships**
+
+### A numerical and a categorical variable
+
+To visualize the relationship between a numerical and a categorical variable we can use side-by-side box plots. A boxplot is a type of visual shorthand for measures of position (percentiles) that describe a distribution. It is also useful for identifying potential outliers.
+
+![](images/EDA-boxplot.png){fig-align="center"}
+
+## 
+
+Let's take a look at the distribution of body mass by species using geom_boxplot():
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+```
+
+## 
+
+Alternatively, we can make density plots with geom_density().
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density(linewidth = 0.75)
+```
+
+## 
+
+We can map species to both color and fill aesthetics and use the alpha aesthetic to add transparency to the filled density curves. This aesthetic takes values between 0 (completely transparent) and 1 (completely opaque). In the following plot it's set to 0.5.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(alpha = 0.5)
+```
+
+## 
+
+### Two categorical variables
+
+We can use stacked bar plots to visualize the relationship between two categorical variables.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+```
+
+## 
+
+A relative frequency plot created by setting position = "fill" in the geom, is more useful for comparing species distributions across islands since it's not affected by the unequal numbers of penguins across the islands.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+```
+
+## 
+
+### Two numerical variables
+
+A scatterplot is probably the most commonly used plot for visualizing the relationship between two numerical variables.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+```
+
+## 
+
+### Three or more variables
+
+We can incorporate more variables into a plot by mapping them to additional aesthetics.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+```
+
+## 
+
+However adding too many aesthetic mappings to a plot makes it cluttered and difficult to make sense of. Another way, which is particularly useful for categorical variables, is to split your plot into facets, subplots that each display one subset of the data.
+
+```{r, fig.align='center'}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island)
+```
+
+## **Summary**
+
+In this course, you've learned the basics of data visualization with ggplot2.
+
+1.  We started with the basic idea that underpins ggplot2: a visualization is a mapping from variables in your data to aesthetic properties like position, color, size and shape.
+
+2.  You then learned about increasing the complexity and improving the presentation of your plots layer-by-layer.
+
+3.  You also learned about commonly used plots for visualizing the distribution of a single variable as well as for visualizing relationships between two or more variables, by leveraging additional aesthetic mappings and/or splitting your plot into small multiples using faceting.
